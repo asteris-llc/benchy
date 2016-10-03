@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/api/annotations.proto";
+
+message Benchmark {
+  // metric types
+  message GoTestBench {
+    string name = 1;
+    string package = 2;
+    uint64 n = 3;
+    double nsPerOp = 4;
+    uint64 allocedBytesPerOp = 5;
+    uint64 allocssPerOp = 6;
+    double mbPerS = 7;
+    int64 measured = 8;
+  }
+
+  string repo = 1;
+  oneof kind {
+    GoTestBench goTestBench = 2;
+  }
+}
+
+message WriteStatus {
+  message Stats {
+    uint64 written = 1;
+  }
+
+  oneof status {
+    Stats stats = 1;
+    string error = 2;
+  }
+}
+
+service Ingester {
+  rpc AddBenchmark (stream Benchmark) returns (WriteStatus) {
+    option (google.api.http) = {
+      post: "/api/v1/benchmarks"
+      body: "*"
+    };
+  }
+}
