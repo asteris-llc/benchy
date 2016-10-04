@@ -45,7 +45,10 @@ be displayed before ingestion.`,
 		ctx := context.Background()
 
 		log.Printf("connecting to %q", viper.GetString("rpc-addr"))
-		client, err := rpc.NewIngesterClient(viper.GetString("rpc-addr"))
+		client, err := rpc.NewIngesterClient(
+			viper.GetString("rpc-addr"),
+			viper.GetString("rpc-token"),
+		)
 		if err != nil {
 			log.Fatal(errors.Wrap(err, "could not get ingester client"))
 		}

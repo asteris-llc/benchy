@@ -35,7 +35,13 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Printf("listening on %s", viper.GetString("addr"))
-		if err := rpc.Listen(context.Background(), viper.GetString("addr")); err != nil {
+		server := rpc.Server{
+			Auth: map[string]string{
+				viper.GetString("token"): viper.GetString("project"),
+			},
+		}
+
+		if err := server.Listen(context.Background(), viper.GetString("addr")); err != nil {
 			log.Fatal(err)
 		}
 	},
@@ -45,4 +51,6 @@ func init() {
 	RootCmd.AddCommand(serveCmd)
 
 	serveCmd.Flags().String("addr", "localhost:8080", "address to serve")
+	serveCmd.Flags().String("project", "", "project to ingest")
+	serveCmd.Flags().String("token", "", "token to use for auth")
 }

@@ -15,17 +15,24 @@ import (
 	"google.golang.org/grpc"
 )
 
-// NewGRPC constructs all servers and handlers
-func NewGRPC() (*grpc.Server, error) {
+// Server handles authentication and serves
+type Server struct {
+	Auth map[string]string
+}
+
+// newGRPC constructs all servers and handlers
+func (s *Server) newGRPC() (*grpc.Server, error) {
 	server := grpc.NewServer()
 
-	pb.RegisterIngesterServer(server, new(ingester))
+	tokenVerifier := NewTokenVerifier(s.Auth)
+
+	pb.RegisterIngesterServer(server, &ingester{tokenVerifier})
 
 	return server, nil
 }
 
-// NewREST constructs a thingy for REST interface
-func NewREST(ctx context.Context, addr string) (*http.Server, error) {
+// newREST constructs a thingy for REST interface
+func (s *Server) newREST(ctx context.Context, addr string) (*http.Server, error) {
 	mux := runtime.NewServeMux()
 	err := pb.RegisterIngesterHandlerFromEndpoint(ctx, mux, addr, []grpc.DialOption{grpc.WithInsecure()})
 	if err != nil {
@@ -40,7 +47,7 @@ func NewREST(ctx context.Context, addr string) (*http.Server, error) {
 }
 
 // Listen on the given address for all the server-y duties
-func Listen(ctx context.Context, addr string) error {
+func (s *Server) Listen(ctx context.Context, addr string) error {
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
 		return errors.Wrap(err, "failed to listen")
@@ -54,7 +61,7 @@ func Listen(ctx context.Context, addr string) error {
 	mux := cmux.New(lis)
 
 	// start GRPC listener
-	grpcSrv, err := NewGRPC()
+	grpcSrv, err := s.newGRPC()
 	if err != nil {
 		return errors.Wrap(err, "failed to create grpc server")
 	}
@@ -65,7 +72,7 @@ func Listen(ctx context.Context, addr string) error {
 	})
 
 	// start REST listener
-	restSrv, err := NewREST(ctx, addr)
+	restSrv, err := s.newREST(ctx, addr)
 	if err != nil {
 		return errors.Wrap(err, "failed to create REST server")
 	}

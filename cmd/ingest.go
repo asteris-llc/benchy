@@ -54,4 +54,5 @@ func init() {
 
 	ingestCmd.PersistentFlags().StringP("timestamp", "t", "", "timestamp for this metric (default now)")
 	ingestCmd.PersistentFlags().String("rpc-addr", "localhost:8080", "address of ingestion RPC server")
+	ingestCmd.PersistentFlags().String("rpc-token", "", "RPC token")
 }

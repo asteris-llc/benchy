@@ -7,8 +7,14 @@ import (
 )
 
 // NewIngesterClient gets an ingester client for a given address
-func NewIngesterClient(addr string) (pb.IngesterClient, error) {
-	conn, err := grpc.Dial(addr, grpc.WithInsecure())
+func NewIngesterClient(addr string, token string) (pb.IngesterClient, error) {
+	auth := NewTokenAuthenticator(token)
+
+	conn, err := grpc.Dial(
+		addr,
+		grpc.WithPerRPCCredentials(auth),
+		grpc.WithInsecure(),
+	)
 	if err != nil {
 		return nil, errors.Wrapf(err, "dialing %s failed", addr)
 	}
