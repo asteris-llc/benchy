@@ -2,3 +2,8 @@ package: github.com/asteris-llc/benchy
 import:
 - package: github.com/grpc-ecosystem/grpc-gateway
   version: ^1.1.0
+- package: github.com/pkg/errors
+  version: ^0.8.0
+- package: golang.org/x/tools
+  subpackages:
+  - benchmark/parse

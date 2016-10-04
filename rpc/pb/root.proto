@@ -12,12 +12,12 @@ message Benchmark {
     uint64 n = 3;
     double nsPerOp = 4;
     uint64 allocedBytesPerOp = 5;
-    uint64 allocssPerOp = 6;
+    uint64 allocsPerOp = 6;
     double mbPerS = 7;
     int64 measured = 8;
   }
 
-  string repo = 1;
+  string project = 1;
   oneof kind {
     GoTestBench goTestBench = 2;
   }
