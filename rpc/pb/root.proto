@@ -18,8 +18,9 @@ message Benchmark {
   }
 
   string project = 1;
+  int64 timestamp = 2;
   oneof kind {
-    GoTestBench goTestBench = 2;
+    GoTestBench goTestBench = 3;
   }
 }
 
