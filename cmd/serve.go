@@ -39,6 +39,11 @@ to quickly create a Cobra application.`,
 			Auth: map[string]string{
 				viper.GetString("token"): viper.GetString("project"),
 			},
+
+			DatabaseAddr:     viper.GetString("influx-addr"),
+			DatabaseUsername: viper.GetString("influx-username"),
+			DatabasePassword: viper.GetString("influx-password"),
+			DatabaseName:     viper.GetString("influx-database"),
 		}
 
 		if err := server.Listen(context.Background(), viper.GetString("addr")); err != nil {
@@ -53,4 +58,10 @@ func init() {
 	serveCmd.Flags().String("addr", "localhost:8080", "address to serve")
 	serveCmd.Flags().String("project", "", "project to ingest")
 	serveCmd.Flags().String("token", "", "token to use for auth")
+
+	// database stuff
+	serveCmd.Flags().String("influx-addr", "http://localhost:8086", "influxdb address")
+	serveCmd.Flags().String("influx-username", "", "influxdb username")
+	serveCmd.Flags().String("influx-password", "", "influxdb password")
+	serveCmd.Flags().String("influx-database", "benchy", "influxdb database")
 }

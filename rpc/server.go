@@ -10,6 +10,7 @@ import (
 
 	"github.com/asteris-llc/benchy/rpc/pb"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	client "github.com/influxdata/influxdb/client/v2"
 	"github.com/pkg/errors"
 	"github.com/soheilhy/cmux"
 	"google.golang.org/grpc"
@@ -18,6 +19,11 @@ import (
 // Server handles authentication and serves
 type Server struct {
 	Auth map[string]string
+
+	DatabaseAddr     string
+	DatabaseUsername string
+	DatabasePassword string
+	DatabaseName     string
 }
 
 // newGRPC constructs all servers and handlers
@@ -26,7 +32,19 @@ func (s *Server) newGRPC() (*grpc.Server, error) {
 
 	tokenVerifier := NewTokenVerifier(s.Auth)
 
-	pb.RegisterIngesterServer(server, &ingester{tokenVerifier})
+	pb.RegisterIngesterServer(
+		server,
+		&ingester{
+			Verifier: tokenVerifier,
+			InfluxConfig: client.HTTPConfig{
+				Addr:      s.DatabaseAddr,
+				Username:  s.DatabaseUsername,
+				Password:  s.DatabasePassword,
+				UserAgent: "benchy",
+			},
+			Database: s.DatabaseName,
+		},
+	)
 
 	return server, nil
 }

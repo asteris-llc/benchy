@@ -98,7 +98,7 @@ func (i *ingester) AddBenchmark(stream pb.Ingester_AddBenchmarkServer) error {
 	}
 	fmt.Println("")
 
-	er := stream.SendAndClose(&pb.WriteStatus{
+	err = stream.SendAndClose(&pb.WriteStatus{
 		Status: &pb.WriteStatus_Stats_{Stats: &pb.WriteStatus_Stats{
 			Written: count,
 		}},
