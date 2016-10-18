@@ -1,4 +1,5 @@
 benchy: rpc/pb/root.pb.go rpc/pb/root.pb.gw.go
+	go build -ldflags="-s -w" main.go
 
 rpc/pb/root.pb.go: rpc/pb/root.proto
 	protoc -I rpc/pb \
