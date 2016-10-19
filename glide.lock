@@ -1,5 +1,5 @@
-hash: 8d86cf26f7e42755e8ec91c761d386ff2cce43e75843b69a238fe6ae348e2b51
-updated: 2016-10-17T22:51:10.092501864-05:00
+hash: 082f4bf204ebebc0415c54315eaaa5f24c5174e5fe78f4c83ce743376c94b75f
+updated: 2016-10-18T23:08:03.841747391-05:00
 imports:
 - name: github.com/BurntSushi/toml
   version: f0aeabca5a127c4078abb8c8d64298b147264b55
@@ -35,12 +35,16 @@ imports:
   version: ff307047057b7797418998a4ed709b0c0f346324
   subpackages:
   - client/v2
+  - models
+  - pkg/escape
 - name: github.com/magiconair/properties
   version: c265cfa48dda6474e208715ca93e987829f572f8
 - name: github.com/mitchellh/mapstructure
   version: d2dd0262208475919e1a362f675cfc0e7c10e905
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
+- name: github.com/Sirupsen/logrus
+  version: 4b6ea7319e214d98c938f12692336f7ca9348d6b
 - name: github.com/soheilhy/cmux
   version: bf4a8ede9e87c006fe1d4278c6c7f2b8be1fa84c
 - name: github.com/spf13/cast
@@ -70,7 +74,7 @@ imports:
   subpackages:
   - unix
 - name: golang.org/x/tools
-  version: 69f6f5b782e1f090edb33f68be67d96673a8059e
+  version: af95c112ad356bcee7a61b6f494e8e47756b970f
   subpackages:
   - benchmark/parse
 - name: google.golang.org/grpc
