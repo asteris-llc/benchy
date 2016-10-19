@@ -1,10 +1,10 @@
 package rpc
 
 import (
-	"fmt"
 	"io"
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/asteris-llc/benchy/rpc/pb"
 	"github.com/influxdata/influxdb/client/v2"
 	"github.com/pkg/errors"
@@ -18,8 +18,16 @@ type ingester struct {
 	Database     string
 }
 
-func (i *ingester) AddBenchmark(stream pb.Ingester_AddBenchmarkServer) error {
+func (i *ingester) AddBenchmark(stream pb.Ingester_AddBenchmarkServer) (err error) {
 	var count uint64
+
+	defer func() {
+		if err != nil {
+			logrus.WithError(err).Error("error adding benchmark")
+		} else {
+			logrus.WithField("written", count).Info("added benchmarks")
+		}
+	}()
 
 	influx, err := client.NewHTTPClient(i.InfluxConfig)
 	if err != nil {
@@ -96,7 +104,6 @@ func (i *ingester) AddBenchmark(stream pb.Ingester_AddBenchmarkServer) error {
 
 		return errors.Wrap(err, "wrinting data points")
 	}
-	fmt.Println("")
 
 	err = stream.SendAndClose(&pb.WriteStatus{
 		Status: &pb.WriteStatus_Stats_{Stats: &pb.WriteStatus_Stats{

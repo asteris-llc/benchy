@@ -69,7 +69,8 @@ be displayed before ingestion.`,
 		for pkg, benchmarks := range benchmarks {
 			for _, benchmark := range benchmarks {
 				err := stream.Send(&pb.Benchmark{
-					Project: args[0],
+					Project:   args[0],
+					Timestamp: int64(viper.GetInt("timestamp-unix")),
 					Kind: &pb.Benchmark_GoTestBench_{GoTestBench: &pb.Benchmark_GoTestBench{
 						Name:              benchmark.Name,
 						Package:           pkg,
