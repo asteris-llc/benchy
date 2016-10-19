@@ -16,8 +16,8 @@ package cmd
 
 import (
 	"context"
-	"log"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/asteris-llc/benchy/rpc"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -34,7 +34,7 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Printf("listening on %s", viper.GetString("addr"))
+		logrus.WithField("addr", viper.GetString("addr")).Info("listening")
 		server := rpc.Server{
 			Auth: map[string]string{
 				viper.GetString("token"): viper.GetString("project"),
@@ -47,7 +47,7 @@ to quickly create a Cobra application.`,
 		}
 
 		if err := server.Listen(context.Background(), viper.GetString("addr")); err != nil {
-			log.Fatal(err)
+			logrus.WithError(err).Fatal("could not serve")
 		}
 	},
 }

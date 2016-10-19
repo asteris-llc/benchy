@@ -16,11 +16,11 @@ package cmd
 
 import (
 	"context"
-	"log"
 	"os"
 
 	"io"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/asteris-llc/benchy/parse/gobench"
 	"github.com/asteris-llc/benchy/rpc"
 	"github.com/asteris-llc/benchy/rpc/pb"
@@ -44,25 +44,25 @@ be displayed before ingestion.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 
-		log.Printf("connecting to %q", viper.GetString("rpc-addr"))
+		logrus.WithField("address", viper.GetString("rpc-addr")).Info("connecting")
 		client, err := rpc.NewIngesterClient(
 			viper.GetString("rpc-addr"),
 			viper.GetString("rpc-token"),
 		)
 		if err != nil {
-			log.Fatal(errors.Wrap(err, "could not get ingester client"))
+			logrus.WithError(err).Fatal("could not get ingester client")
 		}
 
 		reader := io.TeeReader(os.Stdin, os.Stdout)
 		benchmarks, err := gobench.Parse(reader)
 		if err != nil {
-			log.Fatal(errors.Wrap(err, "failed to read benchmarks"))
+			logrus.WithError(err).Fatal("failed to read benchmarks")
 		}
 
 		// send the benchmarks off to the server
 		stream, err := client.AddBenchmark(ctx)
 		if err != nil {
-			errors.Wrap(err, "failed to get stream")
+			logrus.WithError(err).Fatal("failed to get stream")
 		}
 
 		// send everything off
@@ -83,20 +83,20 @@ be displayed before ingestion.`,
 					}},
 				})
 				if err != nil {
-					log.Fatal(errors.Wrap(err, "failed to send benchmark"))
+					logrus.WithError(err).Error("failed to send benchmark")
 				}
 			}
 		}
 
 		receipt, err := stream.CloseAndRecv()
 		if err != nil {
-			errors.Wrap(err, "closing failed")
+			logrus.WithError(err).Fatal("closing failed")
 		}
 
 		if errResult := receipt.GetError(); errResult != "" {
-			log.Fatalf("FAIL\tgot an error: %s", errResult)
+			logrus.WithField("error", errResult).Fatal("FAIL got an error")
 		} else if result := receipt.GetStats(); result != nil {
-			log.Printf("ok  \tsuccess, %d written", result.Written)
+			logrus.WithField("writtn", result.Written).Info("success")
 		}
 	},
 }

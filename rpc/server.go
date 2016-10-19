@@ -2,12 +2,12 @@ package rpc
 
 import (
 	"context"
-	"log"
 	"net"
 	"net/http"
 
 	"golang.org/x/sync/errgroup"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/asteris-llc/benchy/rpc/pb"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	client "github.com/influxdata/influxdb/client/v2"
@@ -85,7 +85,7 @@ func (s *Server) Listen(ctx context.Context, addr string) error {
 	}
 	grpcLis := mux.Match(cmux.HTTP2HeaderField("content-type", "application/grpc"))
 	wg.Go(func() error {
-		log.Println("serving grpc")
+		logrus.Info("serving grpc")
 		return grpcSrv.Serve(grpcLis)
 	})
 
@@ -96,13 +96,13 @@ func (s *Server) Listen(ctx context.Context, addr string) error {
 	}
 	restLis := mux.Match(cmux.HTTP1())
 	wg.Go(func() error {
-		log.Println("waiting for close")
+		logrus.Debug("waiting for close")
 		<-ctx.Done()
-		log.Println("closing")
+		logrus.Debug("closing")
 		return restLis.Close()
 	})
 	wg.Go(func() error {
-		log.Println("serving http")
+		logrus.Info("serving http")
 		return restSrv.Serve(restLis)
 	})
 
